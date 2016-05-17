@@ -3,10 +3,19 @@ var app = express();
 var fs = require('fs');
 var path = require('path');
 var bodyParser = require('body-parser');
+var hbs = require('express-handlebars');
 
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.set("view engine", "hbs");
+app.engine(".hbs", hbs({
+  extname:        ".hbs",
+  partialsDir:    "public/views",
+  layoutsDir:     "public/",
+  defaultLayout:  "index"
+}));
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 
@@ -16,13 +25,13 @@ app.get('/favorites', function(req, res){
   res.send(data);
 });
 
-app.get('favorites', function(req, res){
-  if(!req.body.name || !req.body.oid){
+app.post('/favorites', function(req, res){
+  if(!req.body.title || !req.body.imdbid){
     res.send("Error");
     return
-  };
+  }
   var data = JSON.parse(fs.readFileSync('./data.json'));
-  data.push(req.body);
+  data.push({title: req.body.title, id: req.body.imdbid);
   fs.writeFile('./data.json', JSON.stringify(data));
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
