@@ -34,7 +34,19 @@ app.post('/search/', function(req, res){
     res.render("results", {searchRes: searchRes});
     console.log("res", res, "bodyparsed", searchRes, "req ", req.body);
   });
-})
+});
+
+app.get('/movie/:imdbID', function(req, res){
+
+  movieIdSearch = "http://www.omdbapi.com/?i="+req.params.imdbID+"&r=json";
+
+  request.get(movieIdSearch, function(err, response, body){
+    movie = JSON.parse(body);
+
+    res.render('movie', {movie: movie});
+    console.log(movie);
+  })
+});
 
 app.get('/favorites', function(req, res){
   //reads files synchornously with fs
